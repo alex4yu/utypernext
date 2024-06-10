@@ -5,23 +5,26 @@ function CharElement({letterObj}){
     let status = letterObj.status;
     let displayColor = "white";
 
-    if(letterObj.char === " "){
-        displayCharacter = "_";
-        displayColor = '#001d3d';
-    }
     
-    if(status === "yes"){
+    if(status === "pre"){
+        displayColor = "white";
+        if(letterObj.char === " "){
+            displayCharacter = "_";
+            displayColor = '#001d3d';
+        }
+    }
+    else if(status === "yes"){
         displayColor = "green";
+        if(letterObj.char === " "){
+            displayCharacter = "_";
+            displayColor = '#001d3d';
+        }
     }
     else if(status === "no"){
         displayColor = "red";
     }
-    else if(status === "new"){
-        displayColor = "white";
-    }
-    if(status === "yes" && letterObj.char === " "){
-        displayColor = "#001d3d";
-    }
+    
+
     
     
 

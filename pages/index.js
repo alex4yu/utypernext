@@ -3,13 +3,16 @@ import React, { useEffect, useState } from "react";
 import styles from '../styles/index.module.css';
 import CharElement from "../comp/CharElement";
 
-const {loadLetters} = require("./loadPrompts");
+const {loadLetters, loadWords} = require("./loadPrompts");
 
 export default function Home() {
   const [letters, setLetters] = useState([]);
+  const [wordContainer, setWordContainers] = useState([]);
   const [characterCount, setCharacterCount] = useState(0);
   const [focused, setFocused] = useState(true);
   const [newPrompt, setNewPrompt] = useState(true);
+  const [totalWordLength, setTotalWordLength] = useState(40);
+  const [mode, setMode] = useState("letters");
   
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -18,7 +21,7 @@ export default function Home() {
         const index = characterCount;
         if (char === "Backspace"){
           const updatedLetters = [...letters];
-          updatedLetters[index - 1].status = "new";
+          updatedLetters[index - 1].status = "pre";
           setLetters(updatedLetters);
 
           setCharacterCount(prevCount => prevCount - 1);
@@ -47,11 +50,30 @@ export default function Home() {
   }, [letters, characterCount, focused]);
   
   useEffect(() => {
-    const generate = () => {
+    const generate = async () => {
       setLetters([]);
       setCharacterCount(0);
-      let charArr = loadLetters();
+      var wordList;
+      var charArr = [];
+      if(mode === "words"){
+        wordList = await loadWords(totalWordLength);
+        for(let i = 0; i < wordList.length; i++){
+          let charData = {id: i, char: wordList.charAt(i), status: "pre"}
+          charArr.push(charData);
+        }
+      }
+      else{
+        wordList = loadLetters(totalWordLength)
+        for(let i = 0; i < wordList.length; i++){
+          
+          let charData = {id: i, char: wordList.charAt(i), status: "pre"}
+          charArr.push(charData);
+        }
+        
+      }
+      
       setLetters(charArr);
+      
       document.addEventListener('click', handleClick);
       return () => {
         document.removeEventListener('click', handleClick);
@@ -60,6 +82,8 @@ export default function Home() {
     generate();
     
   }, [newPrompt]);
+
+  
 
   const setPrompt = () =>{
     setNewPrompt(!newPrompt);

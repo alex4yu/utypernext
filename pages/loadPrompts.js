@@ -1,23 +1,52 @@
-const loadLetters = () =>{
-    console.log("loading letters");
+import * as fs from 'fs';
+ 
+
+const loadLetters = (words) =>{
+    //console.log("loading letters");
     let alphabet = "abcdefghijklmnopqrstuvwxyz";
-    let charArr = [];
-    let id = 0;
-    for(let i = 1; i <= 10; i++ ){
+    let wordList = "";
+    for(let i = 1; i <= words; i++ ){
         let wordLength = Math.floor(Math.random()*5)+2;
         for (let i = 1; i <= wordLength; i++){
-            let character_chosen = alphabet.charAt(Math.floor(Math.random()*26));
-            let charData = {id: id, char: character_chosen, status: "pre"}
-            id++;
-            charArr.push(charData);
+            let characterChosen = alphabet.charAt(Math.floor(Math.random()*26));
+            wordList = wordList + characterChosen
         }
-        charArr.push({id: id, char: " ", status: "pre"});   
-        id++    
+        wordList = wordList + " ";
     }
-    charArr.pop();
-    return charArr;
+    wordList = wordList.substring(0,wordList.length-1);  
+    return wordList;
 };
 
+const loadWords = async (words) =>{
+    
+
+
+    var wordList;
+    for(let i = 1; i <= words; i++ )
+    {
+        var fileRandom = Math.floor(Math.random()*100);
+        var word;
+        if (fileRandom > 40){
+            //alert("t100");
+            word = t100Array[Math.floor(Math.random()*t100Array.length)];
+        }
+        else if (fileRandom > 15){
+            //alert("super common");
+            word = superCommonArray[Math.floor(Math.random()*superCommonArray.length)];
+        }
+        else{
+            //alert("common");
+            word = commonArray[Math.floor(Math.random()*commonArray.length)];
+        }
+        
+        wordList = wordList + word + " ";
+    }
+    alert(wordList)
+    wordList = wordList.substring(0,wordList.length-1);  
+    return wordList;
+}
+
 module.exports = {
-    loadLetters
+    loadLetters,
+    loadWords
 }
