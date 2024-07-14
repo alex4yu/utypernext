@@ -1,23 +1,21 @@
-const loadLetters = () =>{
-    console.log("loading letters");
+
+const loadLetters = (words) =>{
+    //console.log("loading letters");
     let alphabet = "abcdefghijklmnopqrstuvwxyz";
-    let charArr = [];
-    let id = 0;
-    for(let i = 1; i <= 10; i++ ){
+    let wordList = "";
+    for(let i = 1; i <= words; i++ ){
         let wordLength = Math.floor(Math.random()*5)+2;
         for (let i = 1; i <= wordLength; i++){
-            let character_chosen = alphabet.charAt(Math.floor(Math.random()*26));
-            let charData = {id: id, char: character_chosen, status: "new"}
-            id++;
-            charArr.push(charData);
+            let characterChosen = alphabet.charAt(Math.floor(Math.random()*26));
+            wordList = wordList + characterChosen
         }
-        charArr.push({id: id, char: " ", status: "new"});   
-        id++    
+        wordList = wordList + " ";
     }
-    charArr.pop();
-    return charArr;
+    wordList = wordList.substring(0,wordList.length-1);  
+    return wordList;
 };
 
+
 module.exports = {
-    loadLetters
+    loadLetters,
 }

@@ -37,6 +37,11 @@
   
 }
 
+.word{
+  display: inline-flex; 
+ 
+}
+
 .next{
   font-size: 40px;
   font-family: "Roboto Mono";
