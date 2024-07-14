@@ -23,9 +23,7 @@ function CharElement({letterObj}){
             displayColor = "#001d3d";
         }
     }
-    if(status === "yes" && letterObj.char === " "){
-        displayColor = "#001d3d";
-    }
+    
     
     
 

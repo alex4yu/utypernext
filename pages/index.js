@@ -39,13 +39,12 @@ export default function Home() {
         setTyping(true);
       }
       if(focused){
-        alert(char);
         const char = event.key;
         const index = characterCount;
         if (char === "Backspace"){
           // if user hits Backspace key, removes last character typed
           const updatedLetters = [...letters];
-          updatedLetters[index - 1].status = "pre";
+          updatedLetters[index - 1].status = "new";
           setLetters(updatedLetters);
           setCharacterCount(prevCount => prevCount - 1);
           setTypedText(typedText.substring(0,typedText.length - 1))
@@ -58,8 +57,8 @@ export default function Home() {
             var timeTaken = (Date.now() - startTime)/1000;
             var correctWords = checkWords()
             var wpm = Math.floor(correctWords/timeTaken*60.0);
-            alert(firstTryCorrectCount);
-            var accuracy = firstTryCorrectCount/characterCount
+            //alert(firstTryCorrectCount);
+            var accuracy = Math.floor(firstTryCorrectCount/characterCount*10000)/100.0
             document.removeEventListener('click', handleClick);
             setTotaltime(timeTaken);
             setWpm(wpm);
@@ -72,7 +71,7 @@ export default function Home() {
           
         }
         else if (index < letters.length && char.length === 1) {
-          // if user has not overtyped prompt, and entered character is a single character, updates information. 
+          // if user has not overtyped prompt, and entered character is a single character, updates typed prompt. 
           const currentLetter = letters[index].char;
           const status = char === currentLetter ? "yes" : "no";
           if(firstTryCorrectArr.length < characterCount){
@@ -107,6 +106,7 @@ export default function Home() {
     };
   }, [letters, characterCount, focused, typing, startTime]);
 
+  //creates and displays prompts on first render and future new prompt requests
   useEffect(() => {
     const generate = async () => {
       setLetters([]);
@@ -118,12 +118,13 @@ export default function Home() {
       var wordList;
       var charArr = [];
       var wordsArr = [];
-      wordList = loadLetters(totalWordLength)
+      wordList = await loadWords(totalWordLength)
+      alert(wordList);
       var wordStart = 0;
       var wordId = 0;
       setPromptText(wordList);
       for(let i = 0; i < wordList.length; i++){
-        let charData = {id: i, char: wordList.charAt(i), status: "pre"}
+        let charData = {id: i, char: wordList.charAt(i), status: "new"}
         charArr.push(charData);
         if(wordList.charAt(i) === " "){
           let wordData = {id: wordId, start: wordStart, end: i}
@@ -181,7 +182,7 @@ export default function Home() {
     <div>{displayInfo? (
       <div>
         <div>WPM: {wpm}</div>
-        <div>Acurracy: {accuracy}</div>
+        <div>Acurracy: {accuracy}%</div>
         <div>Total Time: {totalTime}</div>
         <div>DisplayInfo var: {"" + displayInfo}</div>
         <div className = {styles.generate} onClick={setPrompt}>Next Prompt</div>
