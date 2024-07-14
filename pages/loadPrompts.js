@@ -57,7 +57,7 @@ const loadWords = async (words) =>{
         wordList = wordList + word + " ";
     }
     wordList = wordList.substring(0,wordList.length-1);  
-    alert(wordList);
+    //alert(wordList);
     return wordList;
 };
 

@@ -5,6 +5,7 @@ function WordContainer({wordObj, letters}){
     for(var i = wordObj.start; i <= wordObj.end; i++){
         wordLetters.push(letters[i]);
     }
+    //alert(JSON.stringify(wordLetters));
     return(
         <div className={styles.word}>
         {wordLetters.map(letter => (

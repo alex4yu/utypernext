@@ -1,6 +1,7 @@
-
-.promptTrackerParent
-{
+.modeButtonContainer{
+  display: inline-flex;
+}
+.promptTrackerParent{
   height: 400px;
   width: 100%;
   margin-left: auto;

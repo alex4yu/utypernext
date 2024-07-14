@@ -17,6 +17,7 @@ export default function Home() {
   
   // modes and status
   const [focused, setFocused] = useState(true);
+  const [typingMode, setTypingMode] = useState('words');
   const [typing, setTyping] = useState(false);
   const [displayInfo, setDisplayInfo] = useState(false);
 
@@ -25,12 +26,17 @@ export default function Home() {
 
   // info and data
   const [startTime, setStartTime] = useState(0);
-  const [totalWordLength, setTotalWordLength] = useState(40);
+  const [totalWordLength, setTotalWordLength] = useState(10);
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
   const [totalTime, setTotaltime] = useState(0);
   
-  
+  /*
+  useEffect(() => {
+    alert('wordContainers before map:'+ JSON.stringify(wordContainers));
+  }, [wordContainers]);
+  */
+
   // handles key inputs, if focused updates information to match user key types. 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -47,7 +53,7 @@ export default function Home() {
           updatedLetters[index - 1].status = "new";
           setLetters(updatedLetters);
           setCharacterCount(prevCount => prevCount - 1);
-          setTypedText(typedText.substring(0,typedText.length - 1))
+          setTypedText(typedText.substring(0,typedText.length - 1));
         }
         else if (char === "Enter"){
           // if user hits Enter key, ends test
@@ -55,7 +61,7 @@ export default function Home() {
           setDisplayInfo(!displayInfo);
           if(!displayInfo){
             var timeTaken = (Date.now() - startTime)/1000;
-            var correctWords = checkWords()
+            var correctWords = checkWords();
             var wpm = Math.floor(correctWords/timeTaken*60.0);
             //alert(firstTryCorrectCount);
             var accuracy = Math.floor(firstTryCorrectCount/characterCount*10000)/100.0
@@ -109,34 +115,45 @@ export default function Home() {
   //creates and displays prompts on first render and future new prompt requests
   useEffect(() => {
     const generate = async () => {
+      //alert(typingMode);
+      setWordContainers([])
       setLetters([]);
       setCharacterCount(0);
       setTypedText("");
       setStartTime(0);
       setFirstTryCorrectCount(0);
-      setFirstTryCorrectArr([])
-      var wordList;
+      setFirstTryCorrectArr([]);
+      var wordList = "";
       var charArr = [];
       var wordsArr = [];
-      wordList = await loadWords(totalWordLength)
-      alert(wordList);
+      if(typingMode === 'words'){
+        wordList = await loadWords(totalWordLength);
+      }
+      else{
+        wordList = await loadLetters(totalWordLength);
+      }
+      
+      //alert(wordList);
       var wordStart = 0;
       var wordId = 0;
       setPromptText(wordList);
       for(let i = 0; i < wordList.length; i++){
-        let charData = {id: i, char: wordList.charAt(i), status: "new"}
+        let charData = {id: i, char: wordList.charAt(i), status: "new"};
         charArr.push(charData);
         if(wordList.charAt(i) === " "){
-          let wordData = {id: wordId, start: wordStart, end: i}
+          let wordData = {id: wordId, start: wordStart, end: i};
           wordStart = i+1;
           wordId++;
           wordsArr.push(wordData);
-          
-
+        
         }
+        if(i === wordList.length - 1){
+          let wordData = {id: wordId, start: wordStart, end: i};
+          wordsArr.push(wordData);
+        }
+        
       }  
-      
-      setWordContainers(wordsArr)
+      setWordContainers(wordsArr);
       setLetters(charArr);
       
       document.addEventListener('click', handleClick);
@@ -155,7 +172,7 @@ export default function Home() {
   
   const handleClick = (event) => {
     if(document.getElementById("prompt") === null){
-      return 
+      return ;
     }
     else if (document.getElementById("prompt").contains(event.target)) {
       setFocused(true);
@@ -177,10 +194,15 @@ export default function Home() {
     return wordsCorrect;
   }
 
-
+  const setMode = (mode) =>{
+    //alert('clicked');
+    setTypingMode(mode);
+    setPrompt();
+  }
+  
   return (
     <div>{displayInfo? (
-      <div>
+      <div>{/*Results display*/}
         <div>WPM: {wpm}</div>
         <div>Acurracy: {accuracy}%</div>
         <div>Total Time: {totalTime}</div>
@@ -188,8 +210,12 @@ export default function Home() {
         <div className = {styles.generate} onClick={setPrompt}>Next Prompt</div>
       </div>
     ) : (
-      <div>
+      <div>{/*Main typing display*/}
         <div className = {styles.promptTrackerParent}>
+        <div className = {styles.modeButtonContainer}>
+          <div className = {styles.generate} onClick={() => setMode('words')}>Words</div>
+          <div className = {styles.generate}onClick={() => setMode('letters')}>Letters</div>
+        </div>
         <div className = {styles.trackerParent} >
             <div className = {styles.tracker} id = "timer"></div>
             <div className = {styles.tracker} id = "wpm"></div>
