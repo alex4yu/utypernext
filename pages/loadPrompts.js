@@ -7,11 +7,11 @@ const loadLetters = () =>{
         let wordLength = Math.floor(Math.random()*5)+2;
         for (let i = 1; i <= wordLength; i++){
             let character_chosen = alphabet.charAt(Math.floor(Math.random()*26));
-            let charData = {id: id, char: character_chosen, status: "pre"}
+            let charData = {id: id, char: character_chosen, status: "new"}
             id++;
             charArr.push(charData);
         }
-        charArr.push({id: id, char: " ", status: "pre"});   
+        charArr.push({id: id, char: " ", status: "new"});   
         id++    
     }
     charArr.pop();

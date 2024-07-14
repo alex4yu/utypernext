@@ -7,7 +7,6 @@ function CharElement({letterObj}){
 
     if(letterObj.char === " "){
         displayCharacter = "_";
-        displayColor = '#001d3d';
     }
     
     if(status === "yes"){
@@ -18,6 +17,9 @@ function CharElement({letterObj}){
     }
     else if(status === "new"){
         displayColor = "white";
+        if(letterObj.char === " "){
+            displayColor = "#001d3d";
+        }
     }
     if(status === "yes" && letterObj.char === " "){
         displayColor = "#001d3d";
