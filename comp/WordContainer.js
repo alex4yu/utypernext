@@ -1,6 +1,6 @@
 import CharElement from "../comp/CharElement";
 import styles from "../styles/index.module.css"
-function WordContainer({wordObj, letters}){
+function WordContainer({wordObj, letters, cursorPos}){
     var wordLetters = [];
     for(var i = wordObj.start; i <= wordObj.end; i++){
         wordLetters.push(letters[i]);
@@ -12,6 +12,7 @@ function WordContainer({wordObj, letters}){
             <CharElement
                 key={letter.id}
                 letterObj={letter} 
+                cursorPosition={cursorPos}
             />
             ))}
         </div>

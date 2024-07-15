@@ -49,26 +49,22 @@ export default function Home() {
         const index = characterCount;
         if (char === "Backspace"){
           // if user hits Backspace key, removes last character typed
-          const updatedLetters = [...letters];
-          updatedLetters[index - 1].status = "new";
-          setLetters(updatedLetters);
-          setCharacterCount(prevCount => prevCount - 1);
-          setTypedText(typedText.substring(0,typedText.length - 1));
+          // if no character typed, no backspace happens
+          if(characterCount != 0){
+            const updatedLetters = [...letters];
+            updatedLetters[index - 1].status = "new";
+            setLetters(updatedLetters);
+            setCharacterCount(prevCount => prevCount - 1);
+            setTypedText(typedText.substring(0,typedText.length - 1));
+          }
+          
         }
         else if (char === "Enter"){
           // if user hits Enter key, ends test
           setTyping(false);
           setDisplayInfo(!displayInfo);
           if(!displayInfo){
-            var timeTaken = (Date.now() - startTime)/1000;
-            var correctWords = checkWords();
-            var wpm = Math.floor(correctWords/timeTaken*60.0);
-            //alert(firstTryCorrectCount);
-            var accuracy = Math.floor(firstTryCorrectCount/characterCount*10000)/100.0
-            document.removeEventListener('click', handleClick);
-            setTotaltime(timeTaken);
-            setWpm(wpm);
-            setAccuracy(accuracy);
+            finishTest();
           }
           else{
             //generate and display next prompt by changing dependency array
@@ -97,7 +93,13 @@ export default function Home() {
           updatedLetters[index].status = status;
           setLetters(updatedLetters);
           setCharacterCount(prevCount => prevCount + 1);
+          //console.log(characterCount+1);
           setTypedText(typedText + char);
+          if(characterCount + 1 === promptText.length){
+            setTyping(false);
+            setDisplayInfo(!displayInfo);
+            finishTest();
+          }
         }
       }
       else{
@@ -165,6 +167,19 @@ export default function Home() {
     
   }, [newPrompt]);
 
+  //when the test finishes process test and display results
+  const finishTest = () =>{
+    var timeTaken = (Date.now() - startTime)/1000;
+    var correctWords = checkWords();
+    var wpm = Math.floor(correctWords/timeTaken*60.0);
+    //alert(firstTryCorrectCount);
+    var accuracy = Math.floor(firstTryCorrectCount/characterCount*10000)/100.0
+    document.removeEventListener('click', handleClick);
+    setTotaltime(timeTaken);
+    setWpm(wpm);
+    setAccuracy(accuracy);
+  }
+
   const setPrompt = () =>{
     setNewPrompt(!newPrompt);
     setDisplayInfo(false);
@@ -211,40 +226,42 @@ export default function Home() {
         <div>WPM: {wpm}</div>
         <div>Acurracy: {accuracy}%</div>
         <div>Total Time: {totalTime}</div>
-        <div>DisplayInfo var: {"" + displayInfo}</div>
+        
         <div className = {styles.generate} onClick={setPrompt}>Next Prompt</div>
       </div>
     ) : (
       <div>{/*Main typing display*/}
         <div className = {styles.promptTrackerParent}>
-        <div className = {styles.modeButtonContainer}>
-          <div className = {styles.modeButton} onClick={() => setMode('words')}>Words</div>
-          <div className = {styles.modeButton} onClick={() => setMode('letters')}>Letters</div>
+          <div className = {styles.settingCatagoryContainer}>
+            <div className = {styles.modeCategory} >Typing Mode</div>
+            <div className = {styles.countCategory}>Word Count</div>
+          </div>
+          <div className = {styles.typeSettingsButtons}>
+            <div className = {styles.modeButton} onClick={() => setMode('words')}>Words</div>
+            <div className = {styles.modeButton} onClick={() => setMode('letters')}>Letters</div>
+            <div className = {styles.countButton} onClick={() => setWordCount(10)}>10</div>
+            <div className = {styles.countButton} onClick={() => setWordCount(20)}>20</div>
+            <div className = {styles.countButton} onClick={() => setWordCount(40)}>40</div>
+          </div>
+          <div className = {styles.trackerParent} >
+              <div className = {styles.tracker} id = "timer"></div>
+              <div className = {styles.tracker} id = "wpm"></div>
+              <div className = {styles.tracker} id = "accuracy"></div>
+          </div>
+          <div className = {styles.prompt} id = "prompt">
+            {wordContainers.map(word => (
+              <WordContainer
+                  key={word.id}
+                  wordObj={word} 
+                  letters = {letters}
+                  cursorPos = {characterCount}
+              />
+              ))
+            }
+          </div>
         </div>
-        <div className = {styles.wordCountContainer}>
-          <div >Change prompt length</div>
-          <div className = {styles.wordCountButton} onClick={() => setWordCount(10)}>10</div>
-          <div className = {styles.wordCountButton} onClick={() => setWordCount(20)}>20</div>
-          <div className = {styles.wordCountButton} onClick={() => setWordCount(40)}>40</div>
-        </div>
-        <div className = {styles.trackerParent} >
-            <div className = {styles.tracker} id = "timer"></div>
-            <div className = {styles.tracker} id = "wpm"></div>
-            <div className = {styles.tracker} id = "accuracy"></div>
-        </div>
-        <div className = {styles.prompt} id = "prompt">
-          {wordContainers.map(word => (
-            <WordContainer
-                key={word.id}
-                wordObj={word} 
-                letters = {letters}
-            />
-            ))
-          }
-        </div>
-      </div>
-      <div id="next" className = {styles.next}>{'>'}</div> 
-      <div className = {styles.generate} onClick={setPrompt}> generate </div>
+        <div id="next" className = {styles.next}>{'>'}</div> 
+        <div className = {styles.generate} onClick={setPrompt}> generate </div>
       </div>
     )}
     </div>

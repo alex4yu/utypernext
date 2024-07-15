@@ -1,27 +1,3 @@
-.modeButtonContainer{
-  display: flex;
-}
-.modeButton{
-  display: flex;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  width: 100px;
-  border: solid 1px white;
-}
-.wordCountContainer{
-  display: flex;
-}
-.wordCountButton{
-  display: flex;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  width: 100px;
-  border: solid 1px white;
-}
 .promptTrackerParent{
   height: 400px;
   width: 100%;
@@ -30,6 +6,66 @@
   text-align: left;
   
 }
+.settingCatagoryContainer{
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  display: flex;
+  width: 700px;
+  
+}
+.modeCategory{
+  display: flex;
+  cursor: pointer;
+  margin-left: 30px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 100px;
+  
+}
+.countCategory{
+  display: flex;
+  cursor: pointer;
+  margin-left: 75px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 100px;
+  
+}
+.typeSettingsButtons{
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  display: flex;
+  width: 700px;
+  background-color: #013269;
+  border-radius: 10px;
+}
+.modeButton{
+  display: flex;
+  cursor: pointer;
+  margin-right: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 70px;
+  /*border: solid 1px white;*/
+  
+}
+.countButton{
+  display: flex;
+  cursor: pointer;
+  margin-right: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  /*border: solid 1px white;*/
+  
+}
+
 .trackerParent{
   /*border: 3px solid yellow;*/
   height: 40px;
@@ -54,16 +90,25 @@
   margin-right: auto;
   text-align: left;
   word-wrap: break-word;
-  border: 1px solid white;  
+  /*border: solid 1px white;*/ 
   
   
 }
 
 .word{
   display: inline-flex; 
- 
 }
 
+.characterElement{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  height: 20px;
+  font-family: 'Nunito';
+  /*border: solid 1px white;*/ 
+    
+}
 .next{
   font-size: 40px;
   font-family: "Roboto Mono";
