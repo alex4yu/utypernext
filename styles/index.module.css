@@ -1,5 +1,26 @@
 .modeButtonContainer{
-  display: inline-flex;
+  display: flex;
+}
+.modeButton{
+  display: flex;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 100px;
+  border: solid 1px white;
+}
+.wordCountContainer{
+  display: flex;
+}
+.wordCountButton{
+  display: flex;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 100px;
+  border: solid 1px white;
 }
 .promptTrackerParent{
   height: 400px;

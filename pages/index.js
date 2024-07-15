@@ -199,6 +199,11 @@ export default function Home() {
     setTypingMode(mode);
     setPrompt();
   }
+  const setWordCount = (num) =>{
+    //alert(' word count change clicked');
+    setTotalWordLength(num);
+    setPrompt();
+  }
   
   return (
     <div>{displayInfo? (
@@ -213,8 +218,14 @@ export default function Home() {
       <div>{/*Main typing display*/}
         <div className = {styles.promptTrackerParent}>
         <div className = {styles.modeButtonContainer}>
-          <div className = {styles.generate} onClick={() => setMode('words')}>Words</div>
-          <div className = {styles.generate}onClick={() => setMode('letters')}>Letters</div>
+          <div className = {styles.modeButton} onClick={() => setMode('words')}>Words</div>
+          <div className = {styles.modeButton} onClick={() => setMode('letters')}>Letters</div>
+        </div>
+        <div className = {styles.wordCountContainer}>
+          <div >Change prompt length</div>
+          <div className = {styles.wordCountButton} onClick={() => setWordCount(10)}>10</div>
+          <div className = {styles.wordCountButton} onClick={() => setWordCount(20)}>20</div>
+          <div className = {styles.wordCountButton} onClick={() => setWordCount(40)}>40</div>
         </div>
         <div className = {styles.trackerParent} >
             <div className = {styles.tracker} id = "timer"></div>
