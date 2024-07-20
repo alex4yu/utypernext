@@ -15,6 +15,9 @@ export default function Home() {
   const [firstTryCorrectCount, setFirstTryCorrectCount] = useState(0);
   const [firstTryCorrectArr, setFirstTryCorrectArr] = useState([]);
   
+  // trackers
+  const [seconds, setSeconds] = useState(0);
+
   // modes and status
   const [focused, setFocused] = useState(true);
   const [typingMode, setTypingMode] = useState('words');
@@ -36,6 +39,20 @@ export default function Home() {
     alert('wordContainers before map:'+ JSON.stringify(wordContainers));
   }, [wordContainers]);
   */
+
+  //updates timer
+  useEffect(() => {
+    let timer;
+    if (typing) {
+      timer = setInterval(() => {
+        setSeconds(prevSeconds => prevSeconds + 1);
+      }, 1000);
+    }
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(timer);
+  }, [typing]);
+
 
   // handles key inputs, if focused updates information to match user key types. 
   useEffect(() => {
@@ -123,6 +140,7 @@ export default function Home() {
       setCharacterCount(0);
       setTypedText("");
       setStartTime(0);
+      setSeconds(0);
       setFirstTryCorrectCount(0);
       setFirstTryCorrectArr([]);
       var wordList = "";
@@ -244,9 +262,9 @@ export default function Home() {
             <div className = {styles.countButton} onClick={() => setWordCount(40)}>40</div>
           </div>
           <div className = {styles.trackerParent} >
-              <div className = {styles.tracker} id = "timer"></div>
-              <div className = {styles.tracker} id = "wpm"></div>
-              <div className = {styles.tracker} id = "accuracy"></div>
+            {typing && <div className = {styles.tracker} id = "timer">{seconds}</div>}
+            <div className = {styles.tracker} id = "wpm"></div>
+            <div className = {styles.tracker} id = "accuracy"></div>
           </div>
           <div className = {styles.prompt} id = "prompt">
             {wordContainers.map(word => (

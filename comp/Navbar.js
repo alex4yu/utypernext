@@ -4,9 +4,11 @@ import styles from "../styles/nav.module.css"
 const Navbar = () => {
     return ( 
         <nav>
-            <div className = {styles.logo}>Utyper</div>
-            <div className = {styles.link}>ABC</div>
-            <div className = {styles.link}>Target</div>
+           
+            <Link href="/" className = {styles.logo}>Utyper</Link>
+            <Link href="/" className = {styles.link}>Normal</Link>
+            <Link href="/" className = {styles.link}>Targeted</Link>
+            <Link href="/Settings" className = {styles.link}>Settings</Link>
 
         </nav>
      );
