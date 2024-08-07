@@ -4,6 +4,7 @@ body {
   background: #001d3d;
   color: #ffc300;
   font-family: "Nunito";
+  user-select: none;
 }
 a {
   color: #ffc300;

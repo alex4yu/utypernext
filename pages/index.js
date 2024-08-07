@@ -1,11 +1,16 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import styles from '../styles/index.module.css';
 import WordContainer from "../comp/WordContainer";
+import SettingsContext from "./settingsContext";
+import { user } from "@nextui-org/react";
 
-const {loadLetters, loadWords} = require("./loadPrompts");
 
 export default function Home() {
+  const {loadLetters, loadWords, loadQuote} = require("./loadPrompts");
+  //settings
+  const { settings } = useContext(SettingsContext);
+
   // words and characters
   const [promptText, setPromptText] = useState("");
   const [typedText, setTypedText] = useState("");
@@ -29,7 +34,8 @@ export default function Home() {
 
   // info and data
   const [startTime, setStartTime] = useState(0);
-  const [totalWordLength, setTotalWordLength] = useState(10);
+  const [wordCount, setWordCount] = useState(20);
+  const [quoteLength, setQuoteLength] = useState('medium');
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
   const [totalTime, setTotaltime] = useState(0);
@@ -40,12 +46,36 @@ export default function Home() {
   }, [wordContainers]);
   */
 
-  //updates timer
+  //for checking wpm live
+  const typedTextRef = useRef(typedText);
+  useEffect(() => {
+    typedTextRef.current = typedText;
+  }, [typedText]);
+  
+  //for live accuracy calculation
+  const characterCountRef = useRef(characterCount);
+  useEffect(() =>{
+    characterCountRef.current = characterCount;
+  }, [characterCount])
+  const firstTryCorrectCountRef = useRef(firstTryCorrectCount);
+  useEffect(() =>{
+    firstTryCorrectCountRef.current = firstTryCorrectCount;
+  }, [firstTryCorrectCount])
+
+  //setInterval creates stale state errors 
   useEffect(() => {
     let timer;
     if (typing) {
       timer = setInterval(() => {
         setSeconds(prevSeconds => prevSeconds + 1);
+        if(settings.liveWPM === 'ON' && seconds >= 0){
+          const livewpm = checkWPM();
+          setWpm(livewpm)
+        }
+        if(settings.liveAccuracy === 'ON' && seconds >=0){
+          const accuracy = Math.floor(firstTryCorrectCountRef.current/characterCountRef.current*100);
+          setAccuracy(accuracy);
+        }
       }, 1000);
     }
 
@@ -57,7 +87,7 @@ export default function Home() {
   // handles key inputs, if focused updates information to match user key types. 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if(!typing){
+      if(!typing && !displayInfo && focused){
         setStartTime(Date.now());
         setTyping(true);
       }
@@ -67,7 +97,7 @@ export default function Home() {
         if (char === "Backspace"){
           // if user hits Backspace key, removes last character typed
           // if no character typed, no backspace happens
-          if(characterCount != 0){
+          if(characterCount != 0 && settings.noBackspace === "OFF"){
             const updatedLetters = [...letters];
             updatedLetters[index - 1].status = "new";
             setLetters(updatedLetters);
@@ -89,7 +119,7 @@ export default function Home() {
           }
           
         }
-        else if (index < letters.length && char.length === 1) {
+        else if (index < letters.length && char.length === 1 && !displayInfo) {
           // if user has not overtyped prompt, and entered character is a single character, updates typed prompt. 
           const currentLetter = letters[index].char;
           const status = char === currentLetter ? "yes" : "no";
@@ -112,9 +142,9 @@ export default function Home() {
           setCharacterCount(prevCount => prevCount + 1);
           //console.log(characterCount+1);
           setTypedText(typedText + char);
-          if(characterCount + 1 === promptText.length){
+          if(characterCount + 1 === promptText.length || (settings.noErrors === "ON" && status === "no")){
             setTyping(false);
-            setDisplayInfo(!displayInfo);
+            setDisplayInfo(true);
             finishTest();
           }
         }
@@ -147,10 +177,13 @@ export default function Home() {
       var charArr = [];
       var wordsArr = [];
       if(typingMode === 'words'){
-        wordList = await loadWords(totalWordLength);
+        wordList = await loadWords(wordCount);
       }
       else{
-        wordList = await loadLetters(totalWordLength);
+        wordList = await loadLetters(wordCount);
+      }
+      if(typingMode === 'quotes'){
+        wordList = await loadQuote(quoteLength)
       }
       
       //alert(wordList);
@@ -185,23 +218,23 @@ export default function Home() {
     
   }, [newPrompt]);
 
+  const nextTest = () =>{
+    setTyping(false);
+    setNewPrompt(!newPrompt);
+    setDisplayInfo(false);
+  };
+
   //when the test finishes process test and display results
   const finishTest = () =>{
-    var timeTaken = (Date.now() - startTime)/1000;
-    var correctWords = checkWords();
-    var wpm = Math.floor(correctWords/timeTaken*60.0);
+    const wpm = checkWPM();
+    var timeTaken = Math.floor((Date.now() - startTime)/10)/100;
     //alert(firstTryCorrectCount);
-    var accuracy = Math.floor(firstTryCorrectCount/characterCount*10000)/100.0
+    const accuracy = Math.floor(firstTryCorrectCount/characterCount*10000)/100.0
     document.removeEventListener('click', handleClick);
     setTotaltime(timeTaken);
     setWpm(wpm);
     setAccuracy(accuracy);
   }
-
-  const setPrompt = () =>{
-    setNewPrompt(!newPrompt);
-    setDisplayInfo(false);
-  };
   
   const handleClick = (event) => {
     if(document.getElementById("prompt") === null){
@@ -215,27 +248,35 @@ export default function Home() {
     }
   };
 
-  const checkWords = () => {
-    var promptArr = promptText.split(" ");
-    var typedArr = typedText.split(" ");
-    var wordsCorrect = 0;
+  const checkWPM = () => {
+    const timeTaken = (Date.now() - startTime)/1000;
+    const promptArr = promptText.split(" ");
+    const typedArr = typedTextRef.current.split(" ");
+    console.log(typedText);
+    let wordsCorrect = 0;
     for (let i = 0; i < promptArr.length; i++)
     {
-        if (typedArr != null && promptArr[i] === typedArr[i])
-        { wordsCorrect++;  }
+      if (typedArr != null && promptArr[i] === typedArr[i])
+      { wordsCorrect++;  }
     }
-    return wordsCorrect;
+    let wpm = Math.floor(wordsCorrect/timeTaken*60.0);
+    return wpm;
   }
 
   const setMode = (mode) =>{
     //alert('clicked');
     setTypingMode(mode);
-    setPrompt();
+    setNewPrompt(!newPrompt);
   }
-  const setWordCount = (num) =>{
+  const changeWordCount = (num) =>{
     //alert(' word count change clicked');
-    setTotalWordLength(num);
-    setPrompt();
+    setWordCount(num);
+    setNewPrompt(!newPrompt);
+  }
+  const changeQuoteLength = (length) =>{
+    //alert(' word count change clicked');
+    setQuoteLength(length);
+    setNewPrompt(!newPrompt);
   }
   
   return (
@@ -245,26 +286,42 @@ export default function Home() {
         <div>Acurracy: {accuracy}%</div>
         <div>Total Time: {totalTime}</div>
         
-        <div className = {styles.generate} onClick={setPrompt}>Next Prompt</div>
+        <div className = {styles.generate} onClick={() => nextTest()}>Next Test</div>
       </div>
     ) : (
       <div>{/*Main typing display*/}
         <div className = {styles.promptTrackerParent}>
-          <div className = {styles.settingCatagoryContainer}>
-            <div className = {styles.modeCategory} >Typing Mode</div>
-            <div className = {styles.countCategory}>Word Count</div>
-          </div>
           <div className = {styles.typeSettingsButtons}>
-            <div className = {styles.modeButton} onClick={() => setMode('words')}>Words</div>
-            <div className = {styles.modeButton} onClick={() => setMode('letters')}>Letters</div>
-            <div className = {styles.countButton} onClick={() => setWordCount(10)}>10</div>
-            <div className = {styles.countButton} onClick={() => setWordCount(20)}>20</div>
-            <div className = {styles.countButton} onClick={() => setWordCount(40)}>40</div>
+            <div className = {styles.categoryContainer}>
+              <div className = {typingMode === 'words' ? styles.modeButtonSelected : styles.modeButton} onClick={() => setMode('words')}>Words</div>
+              <div className = {typingMode === 'letters' ? styles.modeButtonSelected : styles.modeButton}  onClick={() => setMode('letters')}>Letters</div>
+              <div className = {typingMode === 'quotes' ? styles.modeButtonSelected : styles.modeButton}  onClick={() => setMode('quotes')}>Quotes</div>
+            </div>
+            <div className = {styles.separator}/>
+            <div>
+              {typingMode === 'quotes' ? (
+                <div className = {styles.categoryContainer}>
+                  <div className = {quoteLength === 'all' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('all')}>all</div>
+                  <div className = {quoteLength === 'short' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('short')}>short</div>
+                  <div className = {quoteLength === 'medium' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('medium')}>medium</div>
+                  <div className = {quoteLength === 'long' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('long')}>long</div>
+                  <div className = {quoteLength === 'Xlong' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('Xlong')}>Xlong</div>
+                </div>
+                ) : (
+                <div className = {styles.categoryContainer}>
+                  <div className = {wordCount === 10 ? styles.countButtonSelected : styles.countButton}  onClick={() => changeWordCount(10)}>10</div>
+                  <div className = {wordCount === 20 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(20)}>20</div>
+                  <div className = {wordCount === 40 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(40)}>40</div>
+                  <div className = {wordCount === 100 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(100)}>100</div>
+                </div>
+                )
+              }
+            </div>
           </div>
           <div className = {styles.trackerParent} >
             {typing && <div className = {styles.tracker} id = "timer">{seconds}</div>}
-            <div className = {styles.tracker} id = "wpm"></div>
-            <div className = {styles.tracker} id = "accuracy"></div>
+            {settings.liveWPM === 'ON' && typing && seconds >= 1 && <div className = {styles.tracker}>{wpm}</div>}
+            {settings.liveAccuracy === 'ON' && typing && seconds >= 1 && <div className = {styles.tracker}>{accuracy}%</div>}
           </div>
           <div className = {styles.prompt} id = "prompt">
             {wordContainers.map(word => (
@@ -278,8 +335,7 @@ export default function Home() {
             }
           </div>
         </div>
-        <div id="next" className = {styles.next}>{'>'}</div> 
-        <div className = {styles.generate} onClick={setPrompt}> generate </div>
+        <div className = {styles.generate} onClick={() => nextTest()}> Restart </div>
       </div>
     )}
     </div>

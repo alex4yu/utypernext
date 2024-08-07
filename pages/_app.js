@@ -1,11 +1,15 @@
 import Layout from "../comp/Layout"
 import '../styles/global.css';
+import { SettingsProvider } from "./settingsContext";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <Layout>
-      <Component {...pageProps}/>
-    </Layout>
+    <SettingsProvider>
+      <Layout>
+        <Component {...pageProps}/>
+      </Layout>
+    </SettingsProvider>
+    
   )
 }
 

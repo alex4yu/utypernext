@@ -6,66 +6,96 @@
   text-align: left;
   
 }
-.settingCatagoryContainer{
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 20px;
-  display: flex;
-  width: 700px;
-  
-}
-.modeCategory{
-  display: flex;
-  cursor: pointer;
-  margin-left: 30px;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  width: 100px;
-  
-}
-.countCategory{
-  display: flex;
-  cursor: pointer;
-  margin-left: 75px;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  width: 100px;
-  
-}
 .typeSettingsButtons{
   margin-left: auto;
   margin-right: auto;
-  padding-left: 20px;
+  margin-top: 60px;
+  height: 40px;
+  width: fit-content;
   display: flex;
-  width: 700px;
-  background-color: #013269;
+  align-items: center;
+  background-color: #002752;
   border-radius: 10px;
 }
+.categoryContainer{
+  margin-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 5px;
+}
+.separator{
+  height: 25px;
+  width: 5px;
+  background-color: #001d3d;
+  border-radius: 15px;
+}
 .modeButton{
+  color: #2271bf;
+  margin-left: 10px;
+  margin-right: 10px;
   display: flex;
   cursor: pointer;
-  margin-right: 20px;
   justify-content: center;
   align-items: center;
   height: 40px;
-  width: 70px;
+  width: 60px;
   /*border: solid 1px white;*/
   
 }
-.countButton{
+.modeButtonSelected{
+  margin-left: 10px;
+  margin-right: 10px;
   display: flex;
   cursor: pointer;
-  margin-right: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 60px;
+  /*border: solid 1px white;*/
+}
+.countButton{
+  color: #2271bf;
+  display: flex;
+  cursor: pointer;
+  margin-right: 15px;
   justify-content: center;
   align-items: center;
   height: 40px;
   width: 40px;
   /*border: solid 1px white;*/
-  
 }
-
+.countButtonSelected{
+  display: flex;
+  cursor: pointer;
+  margin-right: 15px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  /*border: solid 1px white;*/
+}
+.lengthButton{
+  color: #2271bf;
+  display: flex;
+  cursor: pointer;
+  margin-right: 15px;
+  margin-left: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  /*border: solid 1px white;*/
+}
+.lengthButtonSelected{
+  display: flex;
+  cursor: pointer;
+  margin-right: 15px;
+  margin-left: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  /*border: solid 1px white;*/
+}
 .trackerParent{
   /*border: 3px solid yellow;*/
   height: 40px;
@@ -78,11 +108,11 @@
 .tracker {
   display: inline-block;
   height:40px;
-  width: 66px;
+  width: 40px;
   font-size: 20px;
   text-align: left;
-  /*border: 1px solid white;*/
-  margin-right: 20px;
+  /*border: solid 1px white;*/ 
+  margin-right: 5px;
   
 }
 .prompt{
@@ -123,7 +153,10 @@
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  height: 40px;
-  width: 100px;
-  border: solid 1px white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  width: 80px;
+  border: solid 2px #ffc300;
 }

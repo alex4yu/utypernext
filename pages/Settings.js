@@ -1,31 +1,55 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styles from '../styles/settings.module.css';
-
+import SettingsContext from "./settingsContext";
 
 export default function Settings(){
-    const [liveWPM, setLiveWPM] = useState('ON');
-    const [liveAccuracy, setLiveAccuracy] = useState('OFF');
-    const [trueTyping, setTrueTyping] = useState('OFF');
-    const [noError, setNoError] = useState('OFF');
-    const [noBackspace, setNoBackspace] = useState('OFF');
+    const { settings, updateSettings } = useContext(SettingsContext);
 
+    const [liveWPM, setLiveWPM] = useState(settings.liveWPM);
+    const [liveAccuracy, setLiveAccuracy] = useState(settings.liveAccuracy);
+    const [trueTyping, setTrueTyping] = useState(settings.trueTyping);
+    const [noErrors, setNoError] = useState(settings.noErrors);
+    const [noBackspace, setNoBackspace] = useState(settings.noBackspace);
+
+    
+    const handleSave = () => {
+        updateSettings({ theme: newTheme, language: newLanguage });
+    };
+    
+
+    const newSettingValue = (curVal) =>{
+        return curVal === 'ON' ? 'OFF': 'ON';
+    }
     const toggleSetting = (setting) =>{
         if(setting === "liveWPM"){
-            setLiveWPM(liveWPM === 'ON' ? 'OFF': 'ON')
+            const newVal = newSettingValue(liveWPM);
+            setLiveWPM(newVal);
+            updateSettings({ ['liveWPM']: newVal});
         }
         else if(setting === "liveAccuracy"){
-            setLiveAccuracy(liveAccuracy === 'ON' ? 'OFF': 'ON')
+            const newVal = newSettingValue(liveAccuracy);
+            setLiveAccuracy(newVal);
+            updateSettings({ ['liveAccuracy']: newVal});
         }
         else if(setting === "trueTyping"){
-            setTrueTyping(trueTyping === 'ON' ? 'OFF': 'ON')
+            const newVal = newSettingValue(trueTyping);
+            setTrueTyping(newVal);
+            updateSettings({ ['trueTyping']: newVal});
         }
-        else if(setting === "noError"){
-            setNoError(noError === 'ON' ? 'OFF': 'ON')
+        else if(setting === "noErrors"){
+            const newVal = newSettingValue(noErrors);
+            setNoError(newVal);
+            updateSettings({ ['noErrors']: newVal });
         }
         else if(setting === "noBackspace"){
-            setNoBackspace(noBackspace === 'ON' ? 'OFF': 'ON')
+            const newVal = newSettingValue(noBackspace);
+            setNoBackspace(newVal);
+            updateSettings({ ['noBackspace']: newVal});
         }
+        
     }
+
+    
     return(
         <div>
             <div className = {styles.settingSection}>Display</div>
@@ -65,7 +89,7 @@ export default function Settings(){
                     </div>
                 </div>
                 <div className = {styles.buttonsContainer}>
-                    <div className = {styles.settingButton} onClick={()=>toggleSetting('noError')}>{noError}</div>
+                    <div className = {styles.settingButton} onClick={()=>toggleSetting('noErrors')}>{noErrors}</div>
                     <div className = {styles.settingButton} onClick={()=>toggleSetting('noBackspace')}>{noBackspace}</div>
                 </div>
             </div>
