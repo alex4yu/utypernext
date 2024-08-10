@@ -1,10 +1,10 @@
 
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, use } from "react";
 import styles from '../styles/index.module.css';
 import WordContainer from "../comp/WordContainer";
 import SettingsContext from "./settingsContext";
 import { user } from "@nextui-org/react";
-
+import ResultsGraph from "../comp/ResultsGraph"
 
 export default function Home() {
   const {loadLetters, loadWords, loadQuote} = require("./loadPrompts");
@@ -22,6 +22,7 @@ export default function Home() {
   
   // trackers
   const [seconds, setSeconds] = useState(0);
+  const [wpmProgress, setWpmProgress] = useState([]);
 
   // modes and status
   const [focused, setFocused] = useState(true);
@@ -51,12 +52,25 @@ export default function Home() {
   useEffect(() => {
     typedTextRef.current = typedText;
   }, [typedText]);
+
+  const secondsRef = useRef(seconds);
+  useEffect(() => {
+    secondsRef.current = seconds;
+  }, [seconds])
+
+  const wpmProgressRef = useRef(wpmProgress);
+  useEffect(() => {
+    wpmProgressRef.current = wpmProgress;
+  }, [wpmProgress])
   
+
+
   //for live accuracy calculation
   const characterCountRef = useRef(characterCount);
   useEffect(() =>{
     characterCountRef.current = characterCount;
   }, [characterCount])
+
   const firstTryCorrectCountRef = useRef(firstTryCorrectCount);
   useEffect(() =>{
     firstTryCorrectCountRef.current = firstTryCorrectCount;
@@ -68,11 +82,18 @@ export default function Home() {
     if (typing) {
       timer = setInterval(() => {
         setSeconds(prevSeconds => prevSeconds + 1);
-        if(settings.liveWPM === 'ON' && seconds >= 0){
+        if(secondsRef.current >= 0){
           const livewpm = checkWPM();
-          setWpm(livewpm)
+          setWpm(livewpm);
+          if(secondsRef.current > 0){
+            
+            const newProgress = [...wpmProgressRef.current, { time: secondsRef.current, wpm: livewpm }];
+            //console.log("newProgress"+ newProgress);
+            setWpmProgress(newProgress);
+          }
+          
         }
-        if(settings.liveAccuracy === 'ON' && seconds >=0){
+        if(settings.liveAccuracy === 'ON' && secondsRef.current >=0){
           const accuracy = Math.floor(firstTryCorrectCountRef.current/characterCountRef.current*100);
           setAccuracy(accuracy);
         }
@@ -173,6 +194,7 @@ export default function Home() {
       setSeconds(0);
       setFirstTryCorrectCount(0);
       setFirstTryCorrectArr([]);
+      setWpmProgress([]);
       var wordList = "";
       var charArr = [];
       var wordsArr = [];
@@ -285,7 +307,9 @@ export default function Home() {
         <div>WPM: {wpm}</div>
         <div>Acurracy: {accuracy}%</div>
         <div>Total Time: {totalTime}</div>
-        
+        <ResultsGraph
+          data={wpmProgress}
+        />
         <div className = {styles.generate} onClick={() => nextTest()}>Next Test</div>
       </div>
     ) : (
