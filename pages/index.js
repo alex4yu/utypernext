@@ -18,7 +18,7 @@ export default function Home() {
   const [wordContainers, setWordContainers] = useState([]);
   const [characterCount, setCharacterCount] = useState(0);
   const [firstTryCorrectCount, setFirstTryCorrectCount] = useState(0);
-  const [firstTryCorrectArr, setFirstTryCorrectArr] = useState([]);
+  const [firstTryArr, setFirstTryArr] = useState([]);
   
   // trackers
   const [seconds, setSeconds] = useState(0);
@@ -66,10 +66,10 @@ export default function Home() {
 
 
   //for live accuracy calculation
-  const characterCountRef = useRef(characterCount);
+  const firstTryArrRef = useRef(firstTryArr);
   useEffect(() =>{
-    characterCountRef.current = characterCount;
-  }, [characterCount])
+    firstTryArrRef.current = firstTryArr;
+  }, [firstTryArr])
 
   const firstTryCorrectCountRef = useRef(firstTryCorrectCount);
   useEffect(() =>{
@@ -94,7 +94,7 @@ export default function Home() {
           
         }
         if(settings.liveAccuracy === 'ON' && secondsRef.current >=0){
-          const accuracy = Math.floor(firstTryCorrectCountRef.current/characterCountRef.current*100);
+          const accuracy = Math.floor(firstTryCorrectCountRef.current/firstTryArrRef.current.length*100);
           setAccuracy(accuracy);
         }
       }, 1000);
@@ -121,6 +121,9 @@ export default function Home() {
           if(characterCount != 0 && settings.noBackspace === "OFF"){
             const updatedLetters = [...letters];
             updatedLetters[index - 1].status = "new";
+            if(settings.trueTyping){
+              updatedLetters[index - 1].char = promptText.charAt(index - 1)
+            }
             setLetters(updatedLetters);
             setCharacterCount(prevCount => prevCount - 1);
             setTypedText(typedText.substring(0,typedText.length - 1));
@@ -144,21 +147,31 @@ export default function Home() {
           // if user has not overtyped prompt, and entered character is a single character, updates typed prompt. 
           const currentLetter = letters[index].char;
           const status = char === currentLetter ? "yes" : "no";
-          if(firstTryCorrectArr.length < characterCount){
-            var updatedFirstTryCorrectArr = firstTryCorrectArr;
+          if(firstTryArr.length < characterCount){
+            var updatedFirstTryCorrectArr = firstTryArr;
             if(status === "yes"){
               updatedFirstTryCorrectArr.push(true);
-              setFirstTryCorrectArr(updatedFirstTryCorrectArr);
+              setFirstTryArr(updatedFirstTryCorrectArr);
               setFirstTryCorrectCount(firstTryCorrectCount + 1);
             }
             else{
               updatedFirstTryCorrectArr.push(true);
-              setFirstTryCorrectArr(updatedFirstTryCorrectArr);
-              
+              setFirstTryArr(updatedFirstTryCorrectArr);
+              if(settings.noErrors === 'ON'){
+                setTyping(false);
+                setDisplayInfo(true);
+                finishTest();
+                return;
+              }
             }
           }
+          console.log("first try: "+firstTryCorrectCount)
+          console.log("characterCount"+characterCount)
           const updatedLetters = [...letters];
           updatedLetters[index].status = status;
+          if(settings.trueTyping === 'ON'){
+            updatedLetters[index].char = char;
+          }
           setLetters(updatedLetters);
           setCharacterCount(prevCount => prevCount + 1);
           //console.log(characterCount+1);
@@ -193,7 +206,7 @@ export default function Home() {
       setStartTime(0);
       setSeconds(0);
       setFirstTryCorrectCount(0);
-      setFirstTryCorrectArr([]);
+      setFirstTryArr([]);
       setWpmProgress([]);
       var wordList = "";
       var charArr = [];
@@ -314,50 +327,48 @@ export default function Home() {
       </div>
     ) : (
       <div>{/*Main typing display*/}
-        <div className = {styles.promptTrackerParent}>
-          <div className = {styles.typeSettingsButtons}>
-            <div className = {styles.categoryContainer}>
-              <div className = {typingMode === 'words' ? styles.modeButtonSelected : styles.modeButton} onClick={() => setMode('words')}>Words</div>
-              <div className = {typingMode === 'letters' ? styles.modeButtonSelected : styles.modeButton}  onClick={() => setMode('letters')}>Letters</div>
-              <div className = {typingMode === 'quotes' ? styles.modeButtonSelected : styles.modeButton}  onClick={() => setMode('quotes')}>Quotes</div>
-            </div>
-            <div className = {styles.separator}/>
-            <div>
-              {typingMode === 'quotes' ? (
-                <div className = {styles.categoryContainer}>
-                  <div className = {quoteLength === 'all' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('all')}>all</div>
-                  <div className = {quoteLength === 'short' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('short')}>short</div>
-                  <div className = {quoteLength === 'medium' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('medium')}>medium</div>
-                  <div className = {quoteLength === 'long' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('long')}>long</div>
-                  <div className = {quoteLength === 'Xlong' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('Xlong')}>Xlong</div>
-                </div>
-                ) : (
-                <div className = {styles.categoryContainer}>
-                  <div className = {wordCount === 10 ? styles.countButtonSelected : styles.countButton}  onClick={() => changeWordCount(10)}>10</div>
-                  <div className = {wordCount === 20 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(20)}>20</div>
-                  <div className = {wordCount === 40 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(40)}>40</div>
-                  <div className = {wordCount === 100 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(100)}>100</div>
-                </div>
-                )
-              }
-            </div>
+        <div className = {styles.typeSettingsButtons}>
+          <div className = {styles.categoryContainer}>
+            <div className = {typingMode === 'words' ? styles.modeButtonSelected : styles.modeButton} onClick={() => setMode('words')}>Words</div>
+            <div className = {typingMode === 'letters' ? styles.modeButtonSelected : styles.modeButton}  onClick={() => setMode('letters')}>Letters</div>
+            <div className = {typingMode === 'quotes' ? styles.modeButtonSelected : styles.modeButton}  onClick={() => setMode('quotes')}>Quotes</div>
           </div>
-          <div className = {styles.trackerParent} >
-            {typing && <div className = {styles.tracker} id = "timer">{seconds}</div>}
-            {settings.liveWPM === 'ON' && typing && seconds >= 1 && <div className = {styles.tracker}>{wpm}</div>}
-            {settings.liveAccuracy === 'ON' && typing && seconds >= 1 && <div className = {styles.tracker}>{accuracy}%</div>}
-          </div>
-          <div className = {styles.prompt} id = "prompt">
-            {wordContainers.map(word => (
-              <WordContainer
-                  key={word.id}
-                  wordObj={word} 
-                  letters = {letters}
-                  cursorPos = {characterCount}
-              />
-              ))
+          <div className = {styles.separator}/>
+          <div>
+            {typingMode === 'quotes' ? (
+              <div className = {styles.categoryContainer}>
+                <div className = {quoteLength === 'all' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('all')}>all</div>
+                <div className = {quoteLength === 'short' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('short')}>short</div>
+                <div className = {quoteLength === 'medium' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('medium')}>medium</div>
+                <div className = {quoteLength === 'long' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('long')}>long</div>
+                <div className = {quoteLength === 'Xlong' ? styles.lengthButtonSelected : styles.lengthButton}  onClick={() => changeQuoteLength('Xlong')}>Xlong</div>
+              </div>
+              ) : (
+              <div className = {styles.categoryContainer}>
+                <div className = {wordCount === 10 ? styles.countButtonSelected : styles.countButton}  onClick={() => changeWordCount(10)}>10</div>
+                <div className = {wordCount === 20 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(20)}>20</div>
+                <div className = {wordCount === 40 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(40)}>40</div>
+                <div className = {wordCount === 100 ? styles.countButtonSelected : styles.countButton} onClick={() => changeWordCount(100)}>100</div>
+              </div>
+              )
             }
           </div>
+        </div>
+        <div className = {styles.trackerParent} >
+          {typing && <div className = {styles.tracker} id = "timer">{seconds}</div>}
+          {settings.liveWPM === 'ON' && typing && seconds >= 1 && <div className = {styles.tracker}>{wpm}</div>}
+          {settings.liveAccuracy === 'ON' && typing && seconds >= 1 && <div className = {styles.tracker}>{accuracy}%</div>}
+        </div>
+        <div className = {styles.prompt} id = "prompt">
+          {wordContainers.map(word => (
+            <WordContainer
+                key={word.id}
+                wordObj={word} 
+                letters = {letters}
+                cursorPos = {characterCount}
+            />
+            ))
+          }
         </div>
         <div className = {styles.generate} onClick={() => nextTest()}> Restart </div>
       </div>

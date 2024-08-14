@@ -19,7 +19,7 @@ const readFile = async (fileName) =>{
     try {
         const response = await fetch(fileName); 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+            throw new Error('Network response was not ok');
         }
         const text = await response.text(); // Fetches the content as text
 
@@ -34,7 +34,7 @@ const loadWords = async (words) =>{
     let t100Txt = await readFile('/textFiles/t100common.txt');
     let superCommonTxt = await readFile('/textFiles/supercommon.txt');
     let commonTxt = await readFile('/textFiles/common.txt');
-   
+
     let wordList = "";
     let t100Array = t100Txt.split(/\r?\n/);
     //alert(t100Array);

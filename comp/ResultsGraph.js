@@ -2,12 +2,8 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const ResultsGraph = ({ data }) => {
-    const wpmData = [
-        { time: 1, wpm: 20 },
-        { time: 2, wpm: 35 },
-        { time: 3, wpm: 45 },
-        // Add more data points
-    ];
+    const desiredLabelCount = 25;
+    const interval = Math.ceil(data.length / desiredLabelCount);
     return (
         <ResponsiveContainer width="100%" height={350}>
             <LineChart
@@ -24,6 +20,13 @@ const ResultsGraph = ({ data }) => {
                         fontSize: 14,         // Font size
                         fontFamily: 'Nunito',  // Font family
                     }}
+                    //format labels to include last label and at most 25 lables
+                    tickFormatter={(value, index) => {
+                        if (index === data.length - 1) {
+                            return value;
+                        }
+                        return index % interval === 0 ? value : '';
+                    }}  
                     label={{ //axis name
                         value: 'Time (seconds)',   
                         position: 'insideBottom',   
@@ -52,7 +55,9 @@ const ResultsGraph = ({ data }) => {
                         fontFamily: 'Nunito',          
                     }}
                 />
-                <Tooltip />
+                <Tooltip  
+                    contentStyle={{ backgroundColor: '#002752', borderColor: '#002752' }}
+                    itemStyle={{ color: '#ffc300' }}/>
                 <Line type="monotone" dataKey="wpm" stroke="#ffc300" strokeWidth={2} />
             </LineChart>
         </ResponsiveContainer>
