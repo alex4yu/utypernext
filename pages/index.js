@@ -221,10 +221,10 @@ export default function Home() {
       if(typingMode === 'words'){
         wordList = await loadWords(wordCount);
       }
-      else{
+      else if (typingMode === 'letters'){
         wordList = await loadLetters(wordCount);
       }
-      if(typingMode === 'quotes'){
+      else{
         wordList = await loadQuote(quoteLength)
       }
       

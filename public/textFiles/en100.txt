@@ -26,6 +26,7 @@ get
 give
 go
 good
+great
 have
 he
 her

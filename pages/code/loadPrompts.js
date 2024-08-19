@@ -31,34 +31,40 @@ const readFile = async (fileName) =>{
 }
 const loadWords = async (words) =>{
     //console.log("loading words");
-    let t100Txt = await readFile('/textFiles/t100common.txt');
-    let superCommonTxt = await readFile('/textFiles/supercommon.txt');
-    let commonTxt = await readFile('/textFiles/common.txt');
+    let en100Txt = await readFile('/textFiles/en100.txt');
+    let en1kTxt = await readFile('/textFiles/en1k.txt');
+    let en10kTxt = await readFile('/textFiles/en10k.txt');
 
     let wordList = "";
-    let t100Array = t100Txt.split(/\r?\n/);
+    let en100Arr = en100Txt.split(/\r?\n/);
     //alert(t100Array);
-    let superCommonArray = superCommonTxt.split(/\r?\n/);
-    let commonArray = commonTxt.split(/\r?\n/);
+    let en1kArr = en1kTxt.split(/\r?\n/);
+    let en10kArr = en10kTxt.split(/\r?\n/);
 
     for(let i = 1; i <= words; i++ )
     {
         let fileRandom = Math.floor(Math.random()*100);
         let word;
-        if (fileRandom > 50){
+        if (fileRandom > 60){
             //alert("t100");
-            word = t100Array[Math.floor(Math.random()*t100Array.length)];
+            word = en100Arr[Math.floor(Math.random()*en100Arr.length)];
         }
-        else if (fileRandom > 5){
+        else if (fileRandom > 10){
             //alert("super common");
-            word = superCommonArray[Math.floor(Math.random()*superCommonArray.length)];
+            word = en1kArr[Math.floor(Math.random()*en1kArr.length)];
         }
         else{
             //alert("common");
-            word = commonArray[Math.floor(Math.random()*commonArray.length)];
+            word = en10kArr[Math.floor(Math.random()*en10kArr.length)];
+        }
+        // no capital letter for now
+        if(/[A-Z]/.test(word)){
+            i--;
+        }
+        else{
+            wordList = wordList + word + " ";
         }
         
-        wordList = wordList + word + " ";
     }
     wordList = wordList.substring(0,wordList.length-1);  
     //alert(wordList);
