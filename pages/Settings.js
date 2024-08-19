@@ -76,7 +76,7 @@ export default function Settings(){
             updateSettings({ ['bgColor']: 'white'});
             updateSettings({ ['titleColor']: 'black'});
             updateSettings({ ['preTextColor']: '#a3a3a3'});
-            updateSettings({ ['bgLightColor']: '#707070'});
+            updateSettings({ ['bgLightColor']: '#f0f0f0'});
             updateSettings({ ['wrongColor']: 'red'});
         }
         else if(theme === 'night'){
