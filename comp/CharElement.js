@@ -1,32 +1,34 @@
-
-
+import { useContext } from "react";
+import SettingsContext from "../pages/code/settingsContext";
 import styles from '../styles/index.module.css';
 
 function CharElement({letterObj, cursorPosition}){
+    const { settings } = useContext(SettingsContext);
+
     let displayCharacter = letterObj.char;
     let status = letterObj.status;
     let displayColor = "";
-    let cursorColor = "#001d3d";
+    let cursorColor = settings.bgColor;
     if(letterObj.id === cursorPosition){
-        cursorColor = "white";
+        cursorColor = settings.titleColor;
     }
     if(letterObj.char === " "){
         displayCharacter = "_";
     }
     
     if(status === "yes"){
-        displayColor = "#ffc300";
+        displayColor = settings.titleColor;
         if(letterObj.char === " "){
-            displayColor = '#001d3d';
+            displayColor = settings.bgColor;
         }
     }
     else if(status === "no"){
         displayColor = "red";
     }
     else if(status === "new"){
-        displayColor = "#516c8a";
+        displayColor = settings.preTextColor;
         if(letterObj.char === " "){
-            displayColor = "#001d3d";
+            displayColor = settings.bgColor;
         }
     }
     

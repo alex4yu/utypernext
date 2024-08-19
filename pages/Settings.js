@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import styles from '../styles/settings.module.css';
-import SettingsContext from "./settingsContext";
+import SettingsContext from "./code/settingsContext";
 
 export default function Settings(){
     const { settings, updateSettings } = useContext(SettingsContext);
@@ -11,10 +11,14 @@ export default function Settings(){
     const [noErrors, setNoError] = useState(settings.noErrors);
     const [noBackspace, setNoBackspace] = useState(settings.noBackspace);
 
-    
-    const handleSave = () => {
-        updateSettings({ theme: newTheme, language: newLanguage });
-    };
+
+    useEffect(() => {
+    // Apply the CSS variable for body background color
+        document.body.style.setProperty('--bg-color', settings.bgColor);
+        document.body.style.setProperty('--title-color', settings.titleColor);
+        document.body.style.setProperty('--pre-text-color', settings.preTextColor);
+        document.body.style.setProperty('--bg-light-color', settings.bgLightColor);
+    }, [settings.theme]);
     
 
     const newSettingValue = (curVal) =>{
@@ -49,7 +53,43 @@ export default function Settings(){
         
     }
 
-    
+    const changeTheme = (theme) => {
+        console.log('new theme: ' + theme);
+        if(theme === "blueRoyal"){
+            updateSettings({ ['theme']: 'blueRoyal'});
+            updateSettings({ ['bgColor']: '#001d3d'});
+            updateSettings({ ['titleColor']: '#ffc300'});
+            updateSettings({ ['preTextColor']: '#516c8a'});
+            updateSettings({ ['bgLightColor']: '#002752'});
+            updateSettings({ ['wrongColor']: 'red'});
+        }
+        else if(theme === 'matrix'){
+            updateSettings({ ['theme']: 'matrix'});
+            updateSettings({ ['bgColor']: 'black'});
+            updateSettings({ ['titleColor']: '#15d128'});
+            updateSettings({ ['preTextColor']: '#03540b'});
+            updateSettings({ ['bgLightColor']: '#0d2112'});
+            updateSettings({ ['wrongColor']: 'red'});
+        }
+        else if(theme === 'word'){
+            updateSettings({ ['theme']: 'word'});
+            updateSettings({ ['bgColor']: 'white'});
+            updateSettings({ ['titleColor']: 'black'});
+            updateSettings({ ['preTextColor']: '#a3a3a3'});
+            updateSettings({ ['bgLightColor']: '#707070'});
+            updateSettings({ ['wrongColor']: 'red'});
+        }
+        else if(theme === 'night'){
+            updateSettings({ ['theme']: 'night'});
+            updateSettings({ ['bgColor']: '#0e062b'});
+            updateSettings({ ['titleColor']: '#ffec9c'});
+            updateSettings({ ['preTextColor']: '#6a71a5'});
+            updateSettings({ ['bgLightColor']: '#35336b'});
+            updateSettings({ ['wrongColor']: 'red'});
+        }
+    }
+
+
     return(
         <div>
             <div className = {styles.settingSection}>Display</div>
@@ -93,9 +133,31 @@ export default function Settings(){
                     <div className = {styles.settingButton} onClick={()=>toggleSetting('noBackspace')}>{noBackspace}</div>
                 </div>
             </div>
-                
 
-           
+            <div className = {styles.settingSection}>Themes</div>
+            <div className = {styles.sectionContainer}>
+                <div 
+                    className = {styles.theme} 
+                    style={{border: '3px solid #ffc300', color: '#ffc300', background: '#001d3d'}}
+                    onClick={() => changeTheme('blueRoyal')}
+                >Blue Royal</div>
+                <div 
+                    className = {styles.theme} 
+                    style={{border: '3px solid #15d128', color: '#15d128', background: 'black'}}
+                    onClick={() => changeTheme('matrix')}
+                >Matrix</div>
+                <div 
+                    className = {styles.theme} 
+                    style={{border: '3px solid black', color: 'black', background: 'white'}}
+                    onClick={() => changeTheme('word')}
+                >Word</div>
+                <div 
+                    className = {styles.theme} 
+                    style={{border: '3px solid #ffec9c', color: '#ffec9c', background: '#0e062b'}}
+                    onClick={() => changeTheme('night')}
+                >Night</div>
+            </div>
+            
         </div>
         
         

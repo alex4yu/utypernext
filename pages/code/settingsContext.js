@@ -8,7 +8,13 @@ export const SettingsProvider = ({ children }) => {
     liveAccuracy: 'OFF',
     trueTyping: 'OFF',
     noErrors: 'OFF',
-    noBackspace: 'OFF'
+    noBackspace: 'OFF',
+    theme: 'blueRoyal',
+    bgColor: '#001d3d',
+    titleColor: '#ffc300',
+    preTextColor: '#516c8a',
+    bgLightColor: '#002752',
+    wrongColor: 'red'
   });
 
   const updateSettings = (newSettings) => {

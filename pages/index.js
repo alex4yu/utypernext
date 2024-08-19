@@ -2,14 +2,23 @@
 import React, { useContext, useEffect, useState, useRef, use } from "react";
 import styles from '../styles/index.module.css';
 import WordContainer from "../comp/WordContainer";
-import SettingsContext from "./settingsContext";
+import SettingsContext from "./code/settingsContext";
 import { user } from "@nextui-org/react";
 import ResultsGraph from "../comp/ResultsGraph"
 
 export default function Home() {
-  const {loadLetters, loadWords, loadQuote} = require("./loadPrompts");
+  const {loadLetters, loadWords, loadQuote} = require("./code/loadPrompts");
   //settings
   const { settings } = useContext(SettingsContext);
+  useEffect(() => {
+    // Apply the CSS variable for body background color
+    document.body.style.setProperty('--bg-color', settings.bgColor);
+    document.body.style.setProperty('--title-color', settings.titleColor);
+    document.body.style.setProperty('--pre-text-color', settings.preTextColor);
+    document.body.style.setProperty('--bg-light-color', settings.bgLightColor);
+    
+  }, [settings.theme]);
+
 
   // words and characters
   const [promptText, setPromptText] = useState("");
@@ -165,8 +174,6 @@ export default function Home() {
               }
             }
           }
-          console.log("first try: "+firstTryCorrectCount)
-          console.log("characterCount"+characterCount)
           const updatedLetters = [...letters];
           updatedLetters[index].status = status;
           if(settings.trueTyping === 'ON'){
@@ -370,7 +377,7 @@ export default function Home() {
             ))
           }
         </div>
-        <div className = {styles.generate} onClick={() => nextTest()}> Restart </div>
+        <div className = {styles.generate} onClick={() => nextTest()}> Skip </div>
       </div>
     )}
     </div>
