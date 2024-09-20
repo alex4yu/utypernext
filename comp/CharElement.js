@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import SettingsContext from "../pages/code/settingsContext";
+import SettingsContext from "../code/settingsContext";
 import styles from '../styles/index.module.css';
 
 function CharElement({letterObj, cursorPosition}){

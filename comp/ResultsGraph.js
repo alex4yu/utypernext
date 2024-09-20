@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import SettingsContext from "../pages/code/settingsContext";
+import SettingsContext from "../code/settingsContext";
 const ResultsGraph = ({ data }) => {
     const desiredLabelCount = 25;
     const interval = Math.ceil(data.length / desiredLabelCount);

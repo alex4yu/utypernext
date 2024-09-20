@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import styles from '../styles/settings.module.css';
-import SettingsContext from "./code/settingsContext";
+import SettingsContext from "../code/settingsContext";
 
 export default function Settings(){
     

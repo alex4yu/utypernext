@@ -2,11 +2,11 @@
 import React, { useContext, useEffect, useState, useRef, use } from "react";
 import styles from '../styles/target.module.css';
 import WordContainer from "../comp/WordContainer";
-import SettingsContext from "./code/settingsContext";
+import SettingsContext from "../code/settingsContext";
 import ResultsGraph from "../comp/ResultsGraph"
 
 export default function Target() {
-    const {loadTargetWords, loadTargetLetters} = require("./code/loadPrompts");
+    const {loadTargetWords, loadTargetLetters} = require("../code/loadPrompts");
     //settings
 
     const { settings } = useContext(SettingsContext);

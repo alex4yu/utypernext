@@ -2,12 +2,12 @@
 import React, { useContext, useEffect, useState, useRef, use } from "react";
 import styles from '../styles/index.module.css';
 import WordContainer from "../comp/WordContainer";
-import SettingsContext from "./code/settingsContext";
+import SettingsContext from "../code/settingsContext";
 import { user } from "@nextui-org/react";
 import ResultsGraph from "../comp/ResultsGraph"
 
 export default function Home() {
-  const {loadLetters, loadWords, loadQuote} = require("./code/loadPrompts");
+  const {loadLetters, loadWords, loadQuote} = require("../code/loadPrompts");
   //settings
   const { settings } = useContext(SettingsContext);
   useEffect(() => {
