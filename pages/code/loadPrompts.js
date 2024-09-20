@@ -1,9 +1,9 @@
 
-const loadLetters = (words) =>{
+const loadLetters = (size) =>{
     //console.log("loading letters");
     let alphabet = "abcdefghijklmnopqrstuvwxyz";
     let wordList = "";
-    for(let i = 1; i <= words; i++ ){
+    for(let i = 1; i <= size; i++ ){
         let wordLength = Math.floor(Math.random()*5)+2;
         for (let i = 1; i <= wordLength; i++){
             let characterChosen = alphabet.charAt(Math.floor(Math.random()*26));
@@ -29,7 +29,7 @@ const readFile = async (fileName) =>{
     }
     
 }
-const loadWords = async (words) =>{
+const loadWords = async (size) =>{
     //console.log("loading words");
     let en100Txt = await readFile('/textFiles/en100.txt');
     let en1kTxt = await readFile('/textFiles/en1k.txt');
@@ -41,7 +41,7 @@ const loadWords = async (words) =>{
     let en1kArr = en1kTxt.split(/\r?\n/);
     let en10kArr = en10kTxt.split(/\r?\n/);
 
-    for(let i = 1; i <= words; i++ )
+    for(let i = 1; i <= size; i++ )
     {
         let fileRandom = Math.floor(Math.random()*100);
         let word;
@@ -104,11 +104,80 @@ const loadQuote = async (size) =>{
         console.error('Error loading quotes:', error);
     }
     
+}
+
+const loadTargetWords = async (targets, size) => {
+    let wordList = "";
+    let targetArray = [];
+    let targetWordLists = [];
+    for(var i  = 0; i < targets.length; i++){
+        let char = targets[i];
+        if(char != ""){
+            targetArray.push(char);
+            let fileName = "/textFiles/letterFiles/" + char + ".txt";
+            let fileResult = await readFile(fileName);
+            let wordArray = fileResult.split(/\r?\n/)
+            console.log(wordArray);
+            targetWordLists.push(wordArray);
+        }
+    }
+    console.log("target Array: "+targetArray)
+    console.log("target wordList: "+targetWordLists)
+
+    let splits = 100/targetArray.length;
+    for(let i = 1; i <= size; i++ )
+    {
+        let list_random = Math.floor(Math.random()*100);
+        let word = "";
+        if (list_random < splits){
+            word = targetWordLists[0][Math.floor(Math.random()*targetWordLists[0].length)];
+        }
+        else if (list_random < splits * 2){
+            word = targetWordLists[1][Math.floor(Math.random()*targetWordLists[1].length)];
+        }
+        else if (list_random < splits * 3){
+            word = targetWordLists[2][Math.floor(Math.random()*targetWordLists[2].length)];
+        }
+        else if (list_random < splits * 4){
+            word = targetWordLists[3][Math.floor(Math.random()*targetWordLists[3].length)];
+        }
+        else{
+            word = targetWordLists[4][Math.floor(Math.random()*targetWordLists[4].length)];
+        }
+        
+        wordList = wordList + word.trim() + " ";
+    }
+    wordList = wordList.substring(0,wordList.length-1);  
+    return wordList;
+}
+
+const loadTargetLetters = async (targets, size) => {
     
+    let alphabet = "abcdefghijklmnopqrstuvwxyz";
+    for(var i  = 0; i < targets.length; i++){
+        let char = targets[i];
+        if(char != ""){
+            alphabet = alphabet + char.repeat(5);
+        }
+    }
+    //console.log(alphabet)
+    let wordList = "";
+    for(let i = 1; i <= size; i++ ){
+        let wordLength = Math.floor(Math.random()*5)+2;
+        for (let i = 1; i <= wordLength; i++){
+            let characterChosen = alphabet.charAt(Math.floor(Math.random()*alphabet.length));
+            wordList = wordList + characterChosen
+        }
+        wordList = wordList + " ";
+    }
+    wordList = wordList.substring(0,wordList.length-1);  
+    return wordList;
 }
 
 module.exports = {
     loadLetters,
     loadWords,
-    loadQuote
+    loadQuote, 
+    loadTargetWords,
+    loadTargetLetters
 }

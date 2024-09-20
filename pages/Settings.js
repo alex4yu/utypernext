@@ -3,15 +3,8 @@ import styles from '../styles/settings.module.css';
 import SettingsContext from "./code/settingsContext";
 
 export default function Settings(){
+    
     const { settings, updateSettings } = useContext(SettingsContext);
-
-    const [liveWPM, setLiveWPM] = useState(settings.liveWPM);
-    const [liveAccuracy, setLiveAccuracy] = useState(settings.liveAccuracy);
-    const [trueTyping, setTrueTyping] = useState(settings.trueTyping);
-    const [noErrors, setNoError] = useState(settings.noErrors);
-    const [noBackspace, setNoBackspace] = useState(settings.noBackspace);
-
-
     useEffect(() => {
     // Apply the CSS variable for body background color
         document.body.style.setProperty('--bg-color', settings.bgColor);
@@ -19,6 +12,13 @@ export default function Settings(){
         document.body.style.setProperty('--pre-text-color', settings.preTextColor);
         document.body.style.setProperty('--bg-light-color', settings.bgLightColor);
     }, [settings.theme]);
+    const [liveWPM, setLiveWPM] = useState(settings.liveWPM);
+    const [liveAccuracy, setLiveAccuracy] = useState(settings.liveAccuracy);
+    const [trueTyping, setTrueTyping] = useState(settings.trueTyping);
+    const [noErrors, setNoError] = useState(settings.noErrors);
+    const [noBackspace, setNoBackspace] = useState(settings.noBackspace);
+
+    
     
 
     const newSettingValue = (curVal) =>{

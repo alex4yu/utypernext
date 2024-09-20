@@ -6,10 +6,18 @@ import SettingsContext from "./code/settingsContext";
 import ResultsGraph from "../comp/ResultsGraph"
 
 export default function Target() {
-    const {loadLetters, loadWords, loadQuote} = require("./code/loadPrompts");
+    const {loadTargetWords, loadTargetLetters} = require("./code/loadPrompts");
     //settings
-    const { settings } = useContext(SettingsContext);
 
+    const { settings } = useContext(SettingsContext);
+    useEffect(() => {
+        // Apply the CSS variable for body background color
+        document.body.style.setProperty('--bg-color', settings.bgColor);
+        document.body.style.setProperty('--title-color', settings.titleColor);
+        document.body.style.setProperty('--pre-text-color', settings.preTextColor);
+        document.body.style.setProperty('--bg-light-color', settings.bgLightColor);
+    
+    }, [settings.theme]);
 
     // words and characters
     const [promptText, setPromptText] = useState("");
@@ -42,11 +50,15 @@ export default function Target() {
     const [accuracy, setAccuracy] = useState(0);
     const [totalTime, setTotaltime] = useState(0);
 
-    /*
+    // target page specific
+    const [targets, setTargets] = useState(Array(5).fill(''));
+    const [targetIndex, setTargetIndex] = useState(-1);
+
+    
     useEffect(() => {
-        alert('wordContainers before map:'+ JSON.stringify(wordContainers));
-    }, [wordContainers]);
-    */
+        console.log(targetIndex);
+    }, [targetIndex]);
+    
 
     //for checking wpm live
     const typedTextRef = useRef(typedText);
@@ -109,7 +121,26 @@ export default function Target() {
     // handles key inputs, if focused updates information to match user key types. 
     useEffect(() => {
         const handleKeyPress = (event) => {
-        if(!typing && !displayInfo && focused){
+        if(choosingTargets && targetIndex != -1){
+            const char = event.key;
+            console.log(char);
+            // backspace removes target
+            if(char === "Backspace"){
+                let targetsCopy = targets;
+                targetsCopy[targetIndex] = '';
+                setTargets(targetsCopy);
+                setTargetIndex(-1);
+            }
+            else if(char.length === 1){
+                if(/^[a-z]$/.test(char)){
+                    let targetsCopy = targets;
+                    targetsCopy[targetIndex] = char;
+                    setTargets(targetsCopy);
+                    setTargetIndex(-1);
+                }
+            }
+        }
+        if(!typing && !displayInfo && !choosingTargets && focused){
             setStartTime(Date.now());
             setTyping(true);
         }
@@ -117,69 +148,69 @@ export default function Target() {
             const char = event.key;
             const index = characterCount;
             if (char === "Backspace"){
-            // if user hits Backspace key, removes last character typed
-            // if no character typed, no backspace happens
-            if(characterCount != 0 && settings.noBackspace === "OFF"){
-                const updatedLetters = [...letters];
-                updatedLetters[index - 1].status = "new";
-                if(settings.trueTyping){
-                updatedLetters[index - 1].char = promptText.charAt(index - 1)
+                // if user hits Backspace key, removes last character typed
+                // if no character typed, no backspace happens
+                if(characterCount != 0 && settings.noBackspace === "OFF"){
+                    const updatedLetters = [...letters];
+                    updatedLetters[index - 1].status = "new";
+                    if(settings.trueTyping){
+                    updatedLetters[index - 1].char = promptText.charAt(index - 1)
+                    }
+                    setLetters(updatedLetters);
+                    setCharacterCount(prevCount => prevCount - 1);
+                    setTypedText(typedText.substring(0,typedText.length - 1));
                 }
-                setLetters(updatedLetters);
-                setCharacterCount(prevCount => prevCount - 1);
-                setTypedText(typedText.substring(0,typedText.length - 1));
-            }
             
             }
             else if (char === "Enter"){
-            // if user hits Enter key, ends test
-            setTyping(false);
-            setDisplayInfo(!displayInfo);
-            if(!displayInfo){
-                finishTest();
-            }
-            else{
-                //generate and display next prompt by changing dependency array
-                setNewPrompt(!newPrompt);
-            }
+                // if user hits Enter key, ends test
+                setTyping(false);
+                setDisplayInfo(!displayInfo);
+                if(!displayInfo){
+                    finishTest();
+                }
+                else{
+                    //generate and display next prompt by changing dependency array
+                    setNewPrompt(!newPrompt);
+                }
             
             }
             else if (index < letters.length && char.length === 1 && !displayInfo) {
-            // if user has not overtyped prompt, and entered character is a single character, updates typed prompt. 
-            const currentLetter = letters[index].char;
-            const status = char === currentLetter ? "yes" : "no";
-            if(firstTryArr.length < characterCount){
-                var updatedFirstTryCorrectArr = firstTryArr;
-                if(status === "yes"){
-                updatedFirstTryCorrectArr.push(true);
-                setFirstTryArr(updatedFirstTryCorrectArr);
-                setFirstTryCorrectCount(firstTryCorrectCount + 1);
+                // if user has not overtyped prompt, and entered character is a single character, updates typed prompt. 
+                const currentLetter = letters[index].char;
+                const status = char === currentLetter ? "yes" : "no";
+                if(firstTryArr.length < characterCount){
+                    var updatedFirstTryCorrectArr = firstTryArr;
+                    if(status === "yes"){
+                        updatedFirstTryCorrectArr.push(true);
+                        setFirstTryArr(updatedFirstTryCorrectArr);
+                        setFirstTryCorrectCount(firstTryCorrectCount + 1);
+                    }
+                    else{
+                        updatedFirstTryCorrectArr.push(true);
+                        setFirstTryArr(updatedFirstTryCorrectArr);
+                        if(settings.noErrors === 'ON'){
+                            setTyping(false);
+                            setDisplayInfo(true);
+                            finishTest();
+                            return;
+                        }
+                    }
                 }
-                else{
-                updatedFirstTryCorrectArr.push(true);
-                setFirstTryArr(updatedFirstTryCorrectArr);
-                if(settings.noErrors === 'ON'){
+                const updatedLetters = [...letters];
+                updatedLetters[index].status = status;
+                if(settings.trueTyping === 'ON'){
+                    updatedLetters[index].char = char;
+                }
+                setLetters(updatedLetters);
+                setCharacterCount(prevCount => prevCount + 1);
+                //console.log(characterCount+1);
+                setTypedText(typedText + char);
+                if(characterCount + 1 === promptText.length || (settings.noErrors === "ON" && status === "no")){
                     setTyping(false);
                     setDisplayInfo(true);
                     finishTest();
-                    return;
                 }
-                }
-            }
-            const updatedLetters = [...letters];
-            updatedLetters[index].status = status;
-            if(settings.trueTyping === 'ON'){
-                updatedLetters[index].char = char;
-            }
-            setLetters(updatedLetters);
-            setCharacterCount(prevCount => prevCount + 1);
-            //console.log(characterCount+1);
-            setTypedText(typedText + char);
-            if(characterCount + 1 === promptText.length || (settings.noErrors === "ON" && status === "no")){
-                setTyping(false);
-                setDisplayInfo(true);
-                finishTest();
-            }
             }
         }
         else{
@@ -192,7 +223,7 @@ export default function Target() {
         return () => {
         window.removeEventListener('keydown', handleKeyPress);
         };
-    }, [letters, characterCount, focused, typing, startTime]);
+    }, [letters, characterCount, focused, typing, startTime, targetIndex]);
 
     //creates and displays prompts on first render and future new prompt requests
     useEffect(() => {
@@ -211,10 +242,10 @@ export default function Target() {
         var charArr = [];
         var wordsArr = [];
         if(typingMode === 'words'){
-            wordList = await loadWords(wordCount);
+            wordList = await loadTargetWords(targets, wordCount);
         }
         else{
-            wordList = await loadLetters(wordCount);
+            wordList = await loadTargetLetters(targets, wordCount);
         }
         
         //alert(wordList);
@@ -245,9 +276,12 @@ export default function Target() {
             document.removeEventListener('click', handleClick);
         }
         }
-        generate();
+        if(!choosingTargets){
+            generate();
+        }
         
-    }, [newPrompt]);
+        
+    }, [newPrompt, choosingTargets]);
 
     const nextTest = () =>{
         setTyping(false);
@@ -310,10 +344,23 @@ export default function Target() {
         setNewPrompt(!newPrompt);
     }
 
+    const changeTargetIndex = (index) => {
+        setTargetIndex(index);
+    }
     return (
         <div>{choosingTargets? (
         <div>{/*Choosing Target Characters*/}
-            <div className = {styles.instructions}>To select characters to target, click on box then press key</div>
+            <div className = {styles.instructions}>To select characters to target, click on box then press key. Backspace to remove target.</div>
+            <div className = {styles.targetButtonContainer}>
+                <div className = {targetIndex === 0? styles.selectedTarget:styles.targetButton} onClick={() => changeTargetIndex(0)}>{targets[0]}</div>
+                <div className = {targetIndex === 1? styles.selectedTarget:styles.targetButton} onClick={() => changeTargetIndex(1)}>{targets[1]}</div>
+                <div className = {targetIndex === 2? styles.selectedTarget:styles.targetButton} onClick={() => changeTargetIndex(2)}>{targets[2]}</div>
+                <div className = {targetIndex === 3? styles.selectedTarget:styles.targetButton} onClick={() => changeTargetIndex(3)}>{targets[3]}</div>
+                <div className = {targetIndex === 4? styles.selectedTarget:styles.targetButton} onClick={() => changeTargetIndex(4)}>{targets[4]}</div>
+            </div>
+
+            <div className = {styles.continue} onClick={() => SetChoosingTargets(false)}>Continue</div>
+
         </div>
 
         ) : displayInfo? (

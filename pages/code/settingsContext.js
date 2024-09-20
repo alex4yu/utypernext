@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect} from 'react';
 
 const SettingsContext = createContext();
 
@@ -16,6 +16,7 @@ export const SettingsProvider = ({ children }) => {
     bgLightColor: '#002752',
     wrongColor: 'red'
   });
+  //console.log(settings);
 
   const updateSettings = (newSettings) => {
     setSettings((prevSettings) => ({
